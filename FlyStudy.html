@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlyStudy — Terbang Menuju Kampus Impian</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky-50:#EAF4FF;
+    --sky-100:#D3E8FC;
+    --navy-900:#0B1E3D;
+    --navy-700:#16305A;
+    --blue-500:#2C6FB0;
+    --blue-600:#1F5A93;
+    --gold-500:#F5A623;
+    --gold-600:#DB8F14;
+    --green-600:#3F8F5F;
+    --white:#FFFFFF;
+    --ink-soft: rgba(11,30,61,0.62);
+    --ink-faint: rgba(11,30,61,0.38);
+    --radius-card: 18px;
+    --shadow-card: 0 10px 30px -14px rgba(11,30,61,0.28);
+    --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+    --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family: var(--font-body);
+    background: linear-gradient(180deg, var(--sky-50) 0%, #F5FAFF 45%, #FFFFFF 100%);
+    color: var(--navy-900);
+    min-height:100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection{ background: var(--gold-500); color: var(--navy-900); }
+
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family: inherit; cursor:pointer; }
+
+  .wrap{ max-width: 1040px; margin:0 auto; padding: 0 20px 80px; }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 22px 20px 10px; max-width:1040px; margin:0 auto;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand svg{ width:30px; height:30px; flex-shrink:0; }
+  .brand-name{ font-family: var(--font-display); font-weight:700; font-size:22px; letter-spacing:-0.01em; }
+  .brand-name b{ color: var(--blue-600); }
+  .top-tabs{ display:flex; gap:6px; background:var(--white); border:1px solid var(--sky-100); border-radius:999px; padding:4px; box-shadow: var(--shadow-card); }
+  .top-tabs button{ border:none; background:transparent; padding:9px 18px; border-radius:999px; font-size:14px; font-weight:600; color: var(--ink-soft); transition: background .18s ease, color .18s ease; }
+  .top-tabs button.active{ background: var(--navy-900); color:#fff; }
+
+  /* ---------- Hero ---------- */
+  .hero{ padding: 28px 20px 8px; text-align:left; }
+  .hero h1{
+    font-family: var(--font-display); font-weight:700; font-size: clamp(28px, 4.4vw, 44px);
+    line-height:1.06; letter-spacing:-0.02em; margin:0 0 10px; max-width: 620px;
+  }
+  .hero p{ font-size:16px; color: var(--ink-soft); max-width: 480px; margin:0; line-height:1.55; }
+
+  /* ---------- Boarding pass selector ---------- */
+  .pass{
+    margin-top: 26px; background: var(--navy-900); border-radius: 22px; color:#fff;
+    display:grid; grid-template-columns: 1fr auto 220px; position:relative; overflow:visible;
+    box-shadow: 0 24px 50px -20px rgba(11,30,61,0.55);
+  }
+  .pass::before, .pass::after{
+    content:""; position:absolute; width:26px; height:26px; background: var(--sky-50); border-radius:50%; top:50%; transform:translateY(-50%);
+  }
+  .pass::before{ left: calc(100% - 220px - 13px); }
+  .pass::after{ display:none; }
+  .pass-main{ padding: 26px 26px 24px; }
+  .pass-eyebrow{ font-size:11px; text-transform:none; letter-spacing:0.02em; color: var(--gold-500); font-weight:600; margin-bottom:14px; }
+  .pass-groups{ display:flex; flex-wrap:wrap; gap:28px; }
+  .pass-group label{ display:block; font-size:12px; color:rgba(255,255,255,0.55); margin-bottom:8px; }
+  .chip-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .chip{
+    border:1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color:#fff;
+    padding:8px 16px; border-radius:10px; font-size:14px; font-weight:600; transition: all .15s ease;
+  }
+  .chip:hover{ border-color: rgba(255,255,255,0.4); }
+  .chip.active{ background: var(--gold-500); border-color: var(--gold-500); color: var(--navy-900); }
+  .pass-divider{ border-left: 2px dashed rgba(255,255,255,0.22); margin: 18px 0; }
+  .pass-stub{ padding: 26px 22px; display:flex; flex-direction:column; justify-content:center; gap:10px; }
+  .pass-stub-label{ font-size:11px; color: rgba(255,255,255,0.5); }
+  .pass-stub-value{ font-family: var(--font-display); font-size:22px; font-weight:700; line-height:1.15; }
+  .pass-stub-sub{ font-size:12.5px; color: rgba(255,255,255,0.6); }
+  .pass-plane{ position:absolute; right:20px; top:16px; width:34px; height:34px; opacity:0.5; }
+
+  @media (max-width: 720px){
+    .pass{ grid-template-columns: 1fr; }
+    .pass::before{ display:none; }
+    .pass-divider{ border-left:none; border-top: 2px dashed rgba(255,255,255,0.22); margin: 0 22px; }
+  }
+
+  /* ---------- Curriculum toggle ---------- */
+  .curr-row{ display:flex; align-items:center; justify-content:space-between; margin: 30px 0 4px; flex-wrap:wrap; gap:12px; }
+  .curr-row h2{ font-family: var(--font-display); font-size:20px; margin:0; }
+  .curr-toggle{ display:flex; background:var(--white); border:1px solid var(--sky-100); border-radius:12px; padding:3px; }
+  .curr-toggle button{ border:none; background:transparent; padding:8px 14px; border-radius:9px; font-size:13px; font-weight:600; color:var(--ink-soft); }
+  .curr-toggle button.active{ background: var(--sky-50); color: var(--blue-600); }
+
+  /* ---------- Subject grid ---------- */
+  .subject-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(210px,1fr)); gap:14px; margin-top:18px; }
+  .subject-card{
+    background:#fff; border:1px solid var(--sky-100); border-radius: var(--radius-card); padding:18px;
+    display:flex; flex-direction:column; gap:10px; text-align:left; box-shadow: var(--shadow-card);
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .subject-card:hover{ transform: translateY(-3px); border-color: var(--blue-500); }
+  .subject-icon{ width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:19px; }
+  .subject-name{ font-weight:700; font-size:15.5px; }
+  .subject-meta{ font-size:12.5px; color: var(--ink-faint); }
+  .subject-count{ font-size:12px; color: var(--blue-600); font-weight:600; margin-top:auto; }
+
+  .group-label{ font-size:12.5px; font-weight:700; color: var(--ink-faint); letter-spacing:0.02em; margin: 26px 0 4px; }
+
+  /* ---------- Chapter view ---------- */
+  .back-btn{ display:inline-flex; align-items:center; gap:6px; font-size:13.5px; font-weight:600; color: var(--blue-600); margin: 22px 0 14px; background:none; border:none; padding:0; }
+  .subject-header{ display:flex; align-items:center; gap:14px; margin-bottom:6px; }
+  .subject-header .subject-icon{ width:50px; height:50px; border-radius:14px; font-size:24px; }
+  .subject-header h2{ font-family: var(--font-display); font-size:26px; margin:0; }
+  .subject-header p{ margin:2px 0 0; color: var(--ink-soft); font-size:14px; }
+
+  .itinerary{ margin-top: 22px; position:relative; }
+  .itinerary::before{ content:""; position:absolute; left:15px; top:10px; bottom:10px; width:2px; background: var(--sky-100); }
+  .stop{ position:relative; padding-left:44px; margin-bottom:14px; }
+  .stop-dot{ position:absolute; left:8px; top:20px; width:16px; height:16px; border-radius:50%; background:#fff; border:3px solid var(--blue-500); }
+  .stop-card{ background:#fff; border:1px solid var(--sky-100); border-radius:16px; padding:16px 18px; box-shadow: var(--shadow-card); }
+  .stop-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .stop-title{ font-weight:700; font-size:15.5px; }
+  .stop-badge{ font-size:11px; font-weight:700; color: var(--blue-600); background: var(--sky-50); padding:3px 9px; border-radius:999px; white-space:nowrap; }
+  .stop-desc{ font-size:13.5px; color: var(--ink-soft); margin: 8px 0 12px; line-height:1.5; }
+  .stop-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+  .btn-watch{ display:inline-flex; align-items:center; gap:7px; background: var(--navy-900); color:#fff; border:none; padding:9px 15px; border-radius:10px; font-size:13px; font-weight:600; }
+  .btn-watch:hover{ background: var(--blue-600); }
+  .btn-ghost{ display:inline-flex; align-items:center; gap:7px; background:transparent; color: var(--ink-soft); border:1px solid var(--sky-100); padding:9px 15px; border-radius:10px; font-size:13px; font-weight:600; }
+
+  /* ---------- Video panel ---------- */
+  .video-panel{ margin-top:16px; border-radius:16px; overflow:hidden; border:1px solid var(--sky-100); background:#000; display:none; }
+  .video-panel.show{ display:block; }
+  .video-panel iframe{ width:100%; aspect-ratio:16/9; display:block; border:0; }
+  .video-caption{ background:#fff; padding:10px 16px; font-size:12.5px; color: var(--ink-soft); }
+
+  /* ---------- TKA/UTBK page ---------- */
+  .utbk-hero{ background: linear-gradient(135deg, var(--navy-900), var(--blue-600)); color:#fff; border-radius:22px; padding:30px 28px; margin-top:22px; }
+  .utbk-hero h2{ font-family: var(--font-display); font-size:26px; margin:0 0 8px; }
+  .utbk-hero p{ margin:0; color: rgba(255,255,255,0.75); font-size:14px; max-width:520px; line-height:1.55; }
+  .utbk-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(230px,1fr)); gap:14px; margin-top:18px; }
+
+  /* ---------- Footer ---------- */
+  .footer{ margin-top:60px; padding-top:22px; border-top:1px solid var(--sky-100); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+  .footer-note{ font-size:12.5px; color: var(--ink-faint); max-width:520px; line-height:1.5; }
+
+  .empty{ text-align:center; padding: 60px 20px; color: var(--ink-faint); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <svg viewBox="0 0 32 32" fill="none"><path d="M4 18 L27 6 L20 15 L27 26 L17 21 L11 27 L11 19 Z" fill="#F5A623" stroke="#0B1E3D" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    <div class="brand-name">Fly<b>Study</b></div>
+  </div>
+  <div class="top-tabs">
+    <button class="active" data-page="beranda">Beranda</button>
+    <button data-page="tka">TKA &amp; UTBK</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ===================== BERANDA ===================== -->
+  <section id="page-beranda">
+    <div class="hero">
+      <h1>Terbang menuju kampus impian, satu bab pada satu waktu.</h1>
+      <p>Pilih kelas dan jurusanmu, lalu buka materi lengkap SMA kelas X–XII — Kurikulum 2013 dan Kurikulum Merdeka, plus video pembelajaran langsung di dalam aplikasi.</p>
+    </div>
+
+    <div class="pass">
+      <div class="pass-main">
+        <div class="pass-eyebrow">BOARDING PASS BELAJAR</div>
+        <div class="pass-groups">
+          <div class="pass-group">
+            <label>Kelas</label>
+            <div class="chip-row" id="kelas-chips"></div>
+          </div>
+          <div class="pass-group">
+            <label>Jurusan</label>
+            <div class="chip-row" id="jurusan-chips"></div>
+          </div>
+        </div>
+      </div>
+      <div class="pass-divider"></div>
+      <div class="pass-stub">
+        <div class="pass-stub-label">TUJUAN</div>
+        <div class="pass-stub-value" id="stub-kelas">Kelas X</div>
+        <div class="pass-stub-sub" id="stub-jurusan">IPA</div>
+      </div>
+    </div>
+
+    <div class="curr-row">
+      <h2 id="mapel-heading">Mata Pelajaran</h2>
+      <div class="curr-toggle">
+        <button class="active" data-k="merdeka">Kurikulum Merdeka</button>
+        <button data-k="2013">Kurikulum 2013</button>
+      </div>
+    </div>
+
+    <div class="group-label">Mata pelajaran umum</div>
+    <div class="subject-grid" id="grid-umum"></div>
+
+    <div class="group-label" id="peminatan-label">Peminatan IPA</div>
+    <div class="subject-grid" id="grid-peminatan"></div>
+  </section>
+
+  <!-- ===================== SUBJECT / CHAPTER VIEW ===================== -->
+  <section id="page-subject" style="display:none;">
+    <button class="back-btn" id="btn-back">← Kembali ke beranda</button>
+    <div class="subject-header">
+      <div class="subject-icon" id="sub-icon-lg" style="background:var(--sky-50);">📘</div>
+      <div>
+        <h2 id="sub-title-lg">Mata Pelajaran</h2>
+        <p id="sub-meta-lg">Kelas X · IPA</p>
+      </div>
+    </div>
+    <div class="itinerary" id="chapter-list"></div>
+    <div id="video-panel" class="video-panel">
+      <iframe id="video-frame" src="" title="Video pembelajaran" allowfullscreen></iframe>
+      <div class="video-caption" id="video-caption"></div>
+    </div>
+  </section>
+
+  <!-- ===================== TKA & UTBK ===================== -->
+  <section id="page-tka" style="display:none;">
+    <div class="utbk-hero">
+      <h2>Latihan TKA &amp; UTBK-SNBT</h2>
+      <p>Ringkasan materi per subtes, dilengkapi video pembahasan soal dari kreator edukasi seperti Mantappu Academy (Jerome Polin) untuk Penalaran Matematika.</p>
+    </div>
+    <div class="utbk-grid" id="grid-utbk"></div>
+    <div id="tka-chapter-list" style="margin-top:10px;"></div>
+    <div id="tka-video-panel" class="video-panel">
+      <iframe id="tka-video-frame" src="" title="Video pembahasan" allowfullscreen></iframe>
+      <div class="video-caption" id="tka-video-caption"></div>
+    </div>
+  </section>
+
+  <div class="footer">
+    <div class="brand"><svg viewBox="0 0 32 32" width="20" height="20" fill="none"><path d="M4 18 L27 6 L20 15 L27 26 L17 21 L11 27 L11 19 Z" fill="#F5A623" stroke="#0B1E3D" stroke-width="1.4" stroke-linejoin="round"/></svg><span style="font-family:var(--font-display); font-weight:700;">FlyStudy</span></div>
+    <div class="footer-note">Video ditautkan dari kanal edukasi publik di YouTube (mis. Mantappu Academy, dan kreator lain sesuai mapel). Tombol "Cari video" membuka pencarian YouTube untuk topik tersebut.</div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const KELAS = ["X","XI","XII"];
+
+const JURUSAN = [
+  {id:"ipa", nama:"IPA", label:"Peminatan IPA"},
+  {id:"ips", nama:"IPS", label:"Peminatan IPS"},
+  {id:"bahasa", nama:"Bahasa", label:"Peminatan Bahasa & Budaya"},
+];
+
+// icon + color per subject id
+const SUBJECT_META = {
+  matematika: {icon:"📐", color:"#EAF4FF"},
+  bindo: {icon:"📖", color:"#FFF3E6"},
+  bing: {icon:"🇬🇧", color:"#EAF7EF"},
+  sejarah: {icon:"🏛️", color:"#F3EEFB"},
+  ppkn: {icon:"⚖️", color:"#FDEDED"},
+  fisika: {icon:"🧲", color:"#EAF4FF"},
+  kimia: {icon:"🧪", color:"#F0F7EA"},
+  biologi: {icon:"🧬", color:"#EAFBF1"},
+  ekonomi: {icon:"💹", color:"#FFF6E0"},
+  sosiologi: {icon:"🧑‍🤝‍🧑", color:"#F3EEFB"},
+  geografi: {icon:"🗺️", color:"#EAF4FF"},
+  sastra: {icon:"✍️", color:"#FFF3E6"},
+  antropologi: {icon:"🏺", color:"#F3EEFB"},
+};
+
+// Subjects umum (common to all jurusan)
+const UMUM = [
+  {id:"matematika", nama:"Matematika Wajib"},
+  {id:"bindo", nama:"Bahasa Indonesia"},
+  {id:"bing", nama:"Bahasa Inggris"},
+  {id:"sejarah", nama:"Sejarah Indonesia"},
+  {id:"ppkn", nama:"PPKn"},
+];
+
+// Peminatan per jurusan
+const PEMINATAN = {
+  ipa: [
+    {id:"matematika", nama:"Matematika Peminatan", override:"matematika-ipa"},
+    {id:"fisika", nama:"Fisika"},
+    {id:"kimia", nama:"Kimia"},
+    {id:"biologi", nama:"Biologi"},
+  ],
+  ips: [
+    {id:"ekonomi", nama:"Ekonomi"},
+    {id:"sosiologi", nama:"Sosiologi"},
+    {id:"geografi", nama:"Geografi"},
+  ],
+  bahasa: [
+    {id:"sastra", nama:"Sastra Indonesia"},
+    {id:"antropologi", nama:"Antropologi"},
+  ],
+};
+
+// Chapters: keyed by subject id -> curriculum ("merdeka"/"2013") -> kelas -> array of {judul, ringkasan}
+const CHAPTERS = {
+  matematika: {
+    merdeka: {
+      X: [
+        {judul:"Eksponen &amp; Logaritma", ringkasan:"Sifat-sifat bilangan berpangkat, bentuk akar, dan logaritma sebagai kebalikan eksponen."},
+        {judul:"Barisan &amp; Deret", ringkasan:"Pola bilangan, barisan aritmetika dan geometri, serta jumlah suku ke-n."},
+        {judul:"Sistem Persamaan &amp; Pertidaksamaan Linear", ringkasan:"Menyelesaikan SPLDV, SPLTV, dan pertidaksamaan linear dua variabel."},
+      ],
+      XI: [
+        {judul:"Fungsi Komposisi &amp; Fungsi Invers", ringkasan:"Menggabungkan dua fungsi dan mencari fungsi kebalikannya."},
+        {judul:"Trigonometri Lanjutan", ringkasan:"Aturan sinus, cosinus, dan luas segitiga menggunakan trigonometri."},
+        {judul:"Statistika", ringkasan:"Ukuran pemusatan dan penyebaran data tunggal serta data berkelompok."},
+      ],
+      XII: [
+        {judul:"Limit Fungsi", ringkasan:"Konsep limit aljabar dan limit fungsi trigonometri di suatu titik."},
+        {judul:"Turunan Fungsi", ringkasan:"Aturan turunan, turunan fungsi trigonometri, dan aplikasinya pada nilai maksimum-minimum."},
+        {judul:"Integral", ringkasan:"Integral tak tentu dan tentu sebagai kebalikan dari proses turunan."},
+      ],
+    },
+  },
+  fisika: {
+    merdeka: {
+      X: [
+        {judul:"Besaran &amp; Pengukuran", ringkasan:"Besaran pokok, besaran turunan, dan aturan angka penting dalam pengukuran."},
+        {judul:"Gerak Lurus", ringkasan:"Gerak lurus beraturan (GLB) dan gerak lurus berubah beraturan (GLBB)."},
+      ],
+      XI: [
+        {judul:"Hukum Newton &amp; Dinamika", ringkasan:"Tiga hukum Newton dan penerapannya pada gaya gesek serta gerak melingkar."},
+        {judul:"Usaha, Energi &amp; Momentum", ringkasan:"Hubungan usaha dan energi kinetik-potensial, serta hukum kekekalan momentum."},
+      ],
+      XII: [
+        {judul:"Listrik Statis &amp; Dinamis", ringkasan:"Hukum Coulomb, medan listrik, rangkaian arus searah, dan Hukum Ohm."},
+        {judul:"Fisika Modern", ringkasan:"Radiasi benda hitam, efek fotolistrik, dan pengantar teori relativitas."},
+      ],
+    },
+  },
+  kimia: {
+    merdeka: {
+      X: [
+        {judul:"Struktur Atom &amp; Sistem Periodik", ringkasan:"Model atom, konfigurasi elektron, dan tren sifat unsur pada tabel periodik."},
+        {judul:"Ikatan Kimia", ringkasan:"Ikatan ion, kovalen, dan logam serta bentuk molekul sederhana."},
+      ],
+      XI: [
+        {judul:"Larutan Asam-Basa", ringkasan:"Teori asam-basa, pH larutan, dan titrasi asam-basa."},
+        {judul:"Termokimia", ringkasan:"Perubahan entalpi reaksi, reaksi eksoterm dan endoterm."},
+      ],
+      XII: [
+        {judul:"Laju Reaksi &amp; Kesetimbangan", ringkasan:"Faktor yang memengaruhi laju reaksi dan pergeseran kesetimbangan kimia."},
+        {judul:"Kimia Unsur &amp; Senyawa Karbon", ringkasan:"Sifat unsur golongan utama serta gugus fungsi senyawa karbon."},
+      ],
+    },
+  },
+  biologi: {
+    merdeka: {
+      X: [
+        {judul:"Klasifikasi Makhluk Hidup", ringkasan:"Sistem klasifikasi lima kingdom dan keanekaragaman hayati Indonesia."},
+        {judul:"Ekologi &amp; Ekosistem", ringkasan:"Komponen ekosistem, rantai makanan, dan daur biogeokimia."},
+      ],
+      XI: [
+        {judul:"Sistem Organ Manusia", ringkasan:"Struktur dan fungsi sistem pencernaan, pernapasan, dan peredaran darah."},
+        {judul:"Sistem Reproduksi &amp; Pertumbuhan", ringkasan:"Proses reproduksi manusia serta faktor pertumbuhan dan perkembangan."},
+      ],
+      XII: [
+        {judul:"Genetika &amp; Pewarisan Sifat", ringkasan:"Hukum Mendel, persilangan, dan penyimpangan semu hukum Mendel."},
+        {judul:"Bioteknologi", ringkasan:"Bioteknologi konvensional dan modern serta penerapannya di berbagai bidang."},
+      ],
+    },
+  },
+  ekonomi: {
+    merdeka: {
+      X: [
+        {judul:"Konsep Dasar Ekonomi", ringkasan:"Kelangkaan, kebutuhan, biaya peluang, dan sistem ekonomi."},
+        {judul:"Permintaan, Penawaran &amp; Pasar", ringkasan:"Hukum permintaan-penawaran, elastisitas, dan bentuk-bentuk pasar."},
+      ],
+      XI: [
+        {judul:"Pendapatan Nasional", ringkasan:"Menghitung pendapatan nasional dan indikator kesejahteraan ekonomi."},
+        {judul:"Uang, Perbankan &amp; OJK", ringkasan:"Fungsi uang, lembaga keuangan, serta peran bank sentral dan OJK."},
+      ],
+      XII: [
+        {judul:"Akuntansi Perusahaan Jasa", ringkasan:"Siklus akuntansi dari jurnal umum hingga laporan keuangan."},
+        {judul:"Perdagangan Internasional", ringkasan:"Teori perdagangan internasional, ekspor-impor, dan kurs valuta asing."},
+      ],
+    },
+  },
+  sosiologi: {
+    merdeka: {
+      X: [
+        {judul:"Fungsi Sosiologi", ringkasan:"Konsep dasar sosiologi dan realitas sosial di masyarakat."},
+        {judul:"Interaksi Sosial", ringkasan:"Bentuk-bentuk interaksi sosial serta proses asosiatif dan disosiatif."},
+      ],
+      XI: [
+        {judul:"Permasalahan Sosial", ringkasan:"Kemiskinan, kriminalitas, dan kesenjangan sosial di masyarakat."},
+        {judul:"Kelompok Sosial", ringkasan:"Klasifikasi kelompok sosial dan dinamika di dalamnya."},
+      ],
+      XII: [
+        {judul:"Perubahan Sosial", ringkasan:"Faktor pendorong dan penghambat perubahan sosial serta globalisasi."},
+        {judul:"Penelitian Sosial", ringkasan:"Rancangan penelitian sosial dari rumusan masalah hingga laporan."},
+      ],
+    },
+  },
+  geografi: {
+    merdeka: {
+      X: [
+        {judul:"Konsep Dasar Geografi", ringkasan:"Objek studi, pendekatan, dan konsep esensial geografi."},
+        {judul:"Dinamika Litosfer &amp; Atmosfer", ringkasan:"Proses tektonik, vulkanisme, cuaca, dan iklim."},
+      ],
+      XI: [
+        {judul:"Flora, Fauna &amp; Sumber Daya Alam", ringkasan:"Persebaran flora-fauna Indonesia serta potensi sumber daya alam."},
+        {judul:"Kependudukan", ringkasan:"Dinamika kependudukan, sensus, dan piramida penduduk."},
+      ],
+      XII: [
+        {judul:"Pola Keruangan Desa-Kota", ringkasan:"Interaksi desa-kota dan teori lokasi pusat pertumbuhan."},
+        {judul:"Sistem Informasi Geografis", ringkasan:"Pengantar peta, penginderaan jauh, dan SIG."},
+      ],
+    },
+  },
+  sastra: {
+    merdeka: {
+      X: [
+        {judul:"Puisi &amp; Prosa Lama", ringkasan:"Struktur dan unsur puisi lama serta hikayat."},
+        {judul:"Analisis Cerpen", ringkasan:"Unsur intrinsik dan ekstrinsik dalam cerita pendek."},
+      ],
+      XI: [
+        {judul:"Drama &amp; Naskah Teater", ringkasan:"Struktur naskah drama dan teknik pementasan."},
+        {judul:"Puisi Modern", ringkasan:"Gaya bahasa dan makna dalam puisi karya sastrawan modern."},
+      ],
+      XII: [
+        {judul:"Kritik Sastra", ringkasan:"Pendekatan dalam mengkritisi karya sastra Indonesia."},
+        {judul:"Novel &amp; Kajian Tokoh", ringkasan:"Analisis alur, penokohan, dan latar dalam novel."},
+      ],
+    },
+  },
+  antropologi: {
+    merdeka: {
+      X: [
+        {judul:"Konsep Dasar Antropologi", ringkasan:"Kebudayaan, ras, dan keberagaman manusia."},
+        {judul:"Bahasa &amp; Kebudayaan", ringkasan:"Hubungan bahasa sebagai unsur kebudayaan."},
+      ],
+      XI: [
+        {judul:"Keragaman Budaya Lokal", ringkasan:"Kearifan lokal dan tradisi masyarakat Indonesia."},
+        {judul:"Perubahan Budaya", ringkasan:"Akulturasi, asimilasi, dan difusi kebudayaan."},
+      ],
+      XII: [
+        {judul:"Globalisasi Budaya", ringkasan:"Dampak globalisasi terhadap identitas budaya lokal."},
+        {judul:"Etnografi", ringkasan:"Metode penelitian etnografi dalam antropologi."},
+      ],
+    },
+  },
+  bindo: {
+    merdeka: {
+      X: [
+        {judul:"Teks Laporan Hasil Observasi", ringkasan:"Struktur dan kaidah kebahasaan teks laporan observasi."},
+        {judul:"Teks Eksposisi", ringkasan:"Menulis dan menganalisis argumen dalam teks eksposisi."},
+      ],
+      XI: [
+        {judul:"Teks Proposal &amp; Karya Ilmiah", ringkasan:"Sistematika proposal kegiatan dan karya ilmiah sederhana."},
+        {judul:"Resensi", ringkasan:"Menulis resensi buku atau film secara kritis."},
+      ],
+      XII: [
+        {judul:"Surat Lamaran Kerja", ringkasan:"Struktur dan kaidah kebahasaan surat lamaran kerja resmi."},
+        {judul:"Kritik &amp; Esai", ringkasan:"Perbedaan serta teknik menulis kritik dan esai."},
+      ],
+    },
+  },
+  bing: {
+    merdeka: {
+      X: [
+        {judul:"Descriptive Text", ringkasan:"Menggambarkan orang, tempat, atau benda dalam bahasa Inggris."},
+        {judul:"Recount Text", ringkasan:"Menceritakan pengalaman atau kejadian di masa lampau."},
+      ],
+      XI: [
+        {judul:"Analytical Exposition", ringkasan:"Menyampaikan pendapat disertai argumen pendukung."},
+        {judul:"Hortatory Exposition", ringkasan:"Teks yang mengajak pembaca melakukan sesuatu."},
+      ],
+      XII: [
+        {judul:"Application Letter", ringkasan:"Menulis surat lamaran dalam bahasa Inggris."},
+        {judul:"Reported Speech", ringkasan:"Mengubah kalimat langsung menjadi tidak langsung."},
+      ],
+    },
+  },
+  sejarah: {
+    merdeka: {
+      X: [
+        {judul:"Konsep Dasar Ilmu Sejarah", ringkasan:"Kronologi, periodisasi, dan sumber-sumber sejarah."},
+        {judul:"Kerajaan Hindu-Buddha", ringkasan:"Perkembangan kerajaan bercorak Hindu-Buddha di Nusantara."},
+      ],
+      XI: [
+        {judul:"Kolonialisme &amp; Imperialisme", ringkasan:"Kedatangan bangsa Eropa dan dampaknya bagi Nusantara."},
+        {judul:"Pergerakan Nasional", ringkasan:"Lahirnya organisasi pergerakan menuju kemerdekaan."},
+      ],
+      XII: [
+        {judul:"Proklamasi &amp; Revolusi", ringkasan:"Peristiwa sekitar proklamasi dan perjuangan mempertahankan kemerdekaan."},
+        {judul:"Indonesia Masa Orde Baru &amp; Reformasi", ringkasan:"Dinamika politik dan ekonomi Indonesia pasca-1966."},
+      ],
+    },
+  },
+  ppkn: {
+    merdeka: {
+      X: [
+        {judul:"Pancasila sebagai Dasar Negara", ringkasan:"Kedudukan dan fungsi Pancasila dalam kehidupan bernegara."},
+        {judul:"Konstitusi &amp; UUD 1945", ringkasan:"Sejarah dan isi pokok Undang-Undang Dasar 1945."},
+      ],
+      XI: [
+        {judul:"Hak &amp; Kewajiban Warga Negara", ringkasan:"Hubungan hak, kewajiban, dan tanggung jawab warga negara."},
+        {judul:"Sistem Pemerintahan", ringkasan:"Struktur dan mekanisme lembaga-lembaga negara."},
+      ],
+      XII: [
+        {judul:"Hukum &amp; Peradilan", ringkasan:"Sistem hukum nasional dan lembaga peradilan di Indonesia."},
+        {judul:"Hubungan Internasional", ringkasan:"Politik luar negeri dan peran Indonesia di dunia internasional."},
+      ],
+    },
+  },
+};
+
+// Kurikulum 2013 uses the same content set but slightly different chapter grouping label — for simplicity we alias to merdeka data with a note.
+Object.keys(CHAPTERS).forEach(id=>{
+  CHAPTERS[id]["2013"] = CHAPTERS[id]["merdeka"];
+});
+
+// Video source per subject: search query template + creator name
+const VIDEO_SOURCE = {
+  matematika: {creator:"Mantappu Academy (Jerome Polin)", channel:"Mantappu Academy"},
+  fisika: {creator:"Pak Pandani", channel:"Pandani Channel"},
+  kimia: {creator:"Pak Pandani", channel:"Pandani Channel"},
+  biologi: {creator:"Ruangguru", channel:"Ruangguru"},
+  ekonomi: {creator:"Zenius", channel:"Zenius Education"},
+  sosiologi: {creator:"Zenius", channel:"Zenius Education"},
+  geografi: {creator:"Zenius", channel:"Zenius Education"},
+  sastra: {creator:"Ruangguru", channel:"Ruangguru"},
+  antropologi: {creator:"Zenius", channel:"Zenius Education"},
+  bindo: {creator:"Ruangguru", channel:"Ruangguru"},
+  bing: {creator:"English Academy", channel:"English Academy"},
+  sejarah: {creator:"Zenius", channel:"Zenius Education"},
+  ppkn: {creator:"Ruangguru", channel:"Ruangguru"},
+};
+
+// One verified real embed for a highlight case: Jerome Polin membahas soal Matematika SNBT/UTBK
+const FEATURED_VIDEO = {
+  id: "XKa_DmBLra8",
+  title: "Trik Ngerjain Soal Pengetahuan Kuantitatif & Matematika SNBT — Mantappu Academy (Jerome Polin)"
+};
+
+// TKA / UTBK subtests
+const UTBK_SUBTES = [
+  {id:"pu", nama:"Penalaran Umum", icon:"🧠", desc:"Kemampuan menalar logis, analitis, dan memecahkan masalah dari suatu informasi."},
+  {id:"pk", nama:"Pengetahuan Kuantitatif", icon:"🔢", desc:"Kemampuan menyelesaikan masalah menggunakan konsep matematika dasar. Video pembahasan dari Jerome Polin (Mantappu Academy)."},
+  {id:"ppu", nama:"Pemahaman Bacaan Umum", icon:"📄", desc:"Kemampuan memahami dan mengevaluasi bacaan berbahasa Indonesia."},
+  {id:"pm", nama:"Penalaran Matematika", icon:"➗", desc:"Penalaran matematis pada konteks dunia nyata dan data. Video pembahasan dari Jerome Polin (Mantappu Academy)."},
+  {id:"lbi", nama:"Literasi Bahasa Indonesia", icon:"📚", desc:"Kemampuan memahami, menggunakan, mengevaluasi teks berbahasa Indonesia."},
+  {id:"lbe", nama:"Literasi Bahasa Inggris", icon:"🌍", desc:"Kemampuan memahami, menggunakan, dan mengevaluasi teks berbahasa Inggris."},
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let state = {
+  kelas: "X",
+  jurusan: "ipa",
+  kurikulum: "merdeka",
+  page: "beranda", // beranda | subject | tka
+  activeSubject: null,
+};
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function ytSearchUrl(query){
+  return "https://www.youtube.com/results?search_query=" + encodeURIComponent(query);
+}
+
+function renderChips(){
+  const kelasWrap = document.getElementById("kelas-chips");
+  kelasWrap.innerHTML = "";
+  KELAS.forEach(k=>{
+    const b = document.createElement("button");
+    b.className = "chip" + (state.kelas===k ? " active":"");
+    b.textContent = "Kelas " + k;
+    b.onclick = ()=>{ state.kelas = k; renderAll(); };
+    kelasWrap.appendChild(b);
+  });
+
+  const jurWrap = document.getElementById("jurusan-chips");
+  jurWrap.innerHTML = "";
+  JURUSAN.forEach(j=>{
+    const b = document.createElement("button");
+    b.className = "chip" + (state.jurusan===j.id ? " active":"");
+    b.textContent = j.nama;
+    b.onclick = ()=>{ state.jurusan = j.id; renderAll(); };
+    jurWrap.appendChild(b);
+  });
+
+  document.getElementById("stub-kelas").textContent = "Kelas " + state.kelas;
+  const jurObj = JURUSAN.find(j=>j.id===state.jurusan);
+  document.getElementById("stub-jurusan").textContent = jurObj.nama;
+  document.getElementById("peminatan-label").textContent = jurObj.label;
+}
+
+function subjectCard(subj){
+  const meta = SUBJECT_META[subj.id] || {icon:"📘", color:"var(--sky-50)"};
+  const chData = (CHAPTERS[subj.id] && CHAPTERS[subj.id][state.kurikulum] && CHAPTERS[subj.id][state.kurikulum][state.kelas]) || [];
+  const div = document.createElement("button");
+  div.className = "subject-card";
+  div.innerHTML = `
+    <div class="subject-icon" style="background:${meta.color}">${meta.icon}</div>
+    <div>
+      <div class="subject-name">${subj.nama}</div>
+      <div class="subject-meta">Kelas ${state.kelas} · ${state.kurikulum==="merdeka"?"Kurikulum Merdeka":"Kurikulum 2013"}</div>
+    </div>
+    <div class="subject-count">${chData.length} bab tersedia →</div>
+  `;
+  div.onclick = ()=> openSubject(subj);
+  return div;
+}
+
+function renderSubjects(){
+  const gridUmum = document.getElementById("grid-umum");
+  gridUmum.innerHTML = "";
+  UMUM.forEach(s=> gridUmum.appendChild(subjectCard(s)));
+
+  const gridPem = document.getElementById("grid-peminatan");
+  gridPem.innerHTML = "";
+  (PEMINATAN[state.jurusan]||[]).forEach(s=> gridPem.appendChild(subjectCard(s)));
+}
+
+function openSubject(subj){
+  state.activeSubject = subj;
+  state.page = "subject";
+  renderAll();
+}
+
+function renderSubjectPage(){
+  const subj = state.activeSubject;
+  if(!subj) return;
+  const meta = SUBJECT_META[subj.id] || {icon:"📘", color:"var(--sky-50)"};
+  document.getElementById("sub-icon-lg").style.background = meta.color;
+  document.getElementById("sub-icon-lg").textContent = meta.icon;
+  document.getElementById("sub-title-lg").textContent = subj.nama;
+  document.getElementById("sub-meta-lg").textContent = `Kelas ${state.kelas} · ${JURUSAN.find(j=>j.id===state.jurusan).nama} · ${state.kurikulum==="merdeka"?"Kurikulum Merdeka":"Kurikulum 2013"}`;
+
+  const chData = (CHAPTERS[subj.id] && CHAPTERS[subj.id][state.kurikulum] && CHAPTERS[subj.id][state.kurikulum][state.kelas]) || [];
+  const list = document.getElementById("chapter-list");
+  list.innerHTML = "";
+  document.getElementById("video-panel").classList.remove("show");
+
+  if(chData.length===0){
+    list.innerHTML = `<div class="empty">Materi untuk kombinasi ini sedang disiapkan.</div>`;
+    return;
+  }
+
+  const src = VIDEO_SOURCE[subj.id] || {creator:"kreator edukasi", channel:""};
+
+  chData.forEach((ch, idx)=>{
+    const stop = document.createElement("div");
+    stop.className = "stop";
+    const query = `${subj.nama} ${ch.judul.replace(/&amp;/g,"&")} kelas ${state.kelas} ${src.channel}`;
+    stop.innerHTML = `
+      <div class="stop-dot"></div>
+      <div class="stop-card">
+        <div class="stop-top">
+          <div class="stop-title">Bab ${idx+1}. ${ch.judul}</div>
+          <div class="stop-badge">${state.kurikulum==="merdeka"?"Merdeka":"K-13"}</div>
+        </div>
+        <div class="stop-desc">${ch.ringkasan}</div>
+        <div class="stop-actions">
+          <button class="btn-watch" data-query="${encodeURIComponent(query)}" data-creator="${src.creator}" data-title="${ch.judul.replace(/&amp;/g,"&")}">▶ Tonton video · ${src.creator}</button>
+          <a class="btn-ghost" href="${ytSearchUrl(query)}" target="_blank" rel="noopener">Buka di YouTube ↗</a>
+        </div>
+      </div>
+    `;
+    list.appendChild(stop);
+  });
+
+  list.querySelectorAll(".btn-watch").forEach(btn=>{
+    btn.onclick = ()=>{
+      const panel = document.getElementById("video-panel");
+      const frame = document.getElementById("video-frame");
+      const cap = document.getElementById("video-caption");
+      // Use the verified featured video for Matematika, otherwise embed a YouTube search-results driven single best-guess via lite embed fallback link
+      if(subj.id === "matematika"){
+        frame.src = "https://www.youtube.com/embed/" + FEATURED_VIDEO.id;
+        cap.textContent = FEATURED_VIDEO.title;
+      } else {
+        // no verified single video id available in-app; show creator channel search embed is not supported by YouTube,
+        // so we surface a clear call-to-action instead of a broken player.
+        frame.src = "";
+        cap.innerHTML = `Pratinjau video untuk topik ini belum tersedia langsung di dalam aplikasi. Ketuk "Buka di YouTube ↗" pada bab yang sama untuk menonton pembahasan dari ${btn.dataset.creator}.`;
+      }
+      panel.classList.add("show");
+      panel.scrollIntoView({behavior:"smooth", block:"center"});
+    };
+  });
+}
+
+function renderUtbk(){
+  const grid = document.getElementById("grid-utbk");
+  grid.innerHTML = "";
+  UTBK_SUBTES.forEach(s=>{
+    const card = document.createElement("button");
+    card.className = "subject-card";
+    card.innerHTML = `
+      <div class="subject-icon" style="background:var(--sky-50)">${s.icon}</div>
+      <div>
+        <div class="subject-name">${s.nama}</div>
+        <div class="subject-meta">${s.desc}</div>
+      </div>
+      <div class="subject-count">Buka pembahasan →</div>
+    `;
+    card.onclick = ()=> openUtbkSubtes(s);
+    grid.appendChild(card);
+  });
+  document.getElementById("tka-chapter-list").innerHTML = "";
+  document.getElementById("tka-video-panel").classList.remove("show");
+}
+
+function openUtbkSubtes(s){
+  const list = document.getElementById("tka-chapter-list");
+  const query = `pembahasan soal ${s.nama} UTBK SNBT`;
+  const isMath = (s.id==="pk" || s.id==="pm");
+  list.innerHTML = `
+    <div class="itinerary">
+      <div class="stop">
+        <div class="stop-dot"></div>
+        <div class="stop-card">
+          <div class="stop-top">
+            <div class="stop-title">${s.icon} ${s.nama}</div>
+            <div class="stop-badge">TKA/UTBK</div>
+          </div>
+          <div class="stop-desc">${s.desc}</div>
+          <div class="stop-actions">
+            <button class="btn-watch" id="tka-watch-btn">▶ Tonton pembahasan</button>
+            <a class="btn-ghost" href="${ytSearchUrl(query)}" target="_blank" rel="noopener">Buka di YouTube ↗</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById("tka-watch-btn").onclick = ()=>{
+    const panel = document.getElementById("tka-video-panel");
+    const frame = document.getElementById("tka-video-frame");
+    const cap = document.getElementById("tka-video-caption");
+    if(isMath){
+      frame.src = "https://www.youtube.com/embed/" + FEATURED_VIDEO.id;
+      cap.textContent = FEATURED_VIDEO.title;
+    } else {
+      frame.src = "";
+      cap.textContent = `Pratinjau langsung belum tersedia untuk subtes ini — ketuk "Buka di YouTube ↗" untuk menonton pembahasan.`;
+    }
+    panel.classList.add("show");
+    panel.scrollIntoView({behavior:"smooth", block:"center"});
+  };
+}
+
+function renderPageVisibility(){
+  document.getElementById("page-beranda").style.display = state.page==="beranda" ? "block":"none";
+  document.getElementById("page-subject").style.display = state.page==="subject" ? "block":"none";
+  document.getElementById("page-tka").style.display = state.page==="tka" ? "block":"none";
+
+  document.querySelectorAll(".top-tabs button").forEach(b=>b.classList.remove("active"));
+  if(state.page==="tka"){
+    document.querySelector('.top-tabs button[data-page="tka"]').classList.add("active");
+  } else {
+    document.querySelector('.top-tabs button[data-page="beranda"]').classList.add("active");
+  }
+}
+
+function renderAll(){
+  renderChips();
+  renderSubjects();
+  if(state.page==="subject") renderSubjectPage();
+  if(state.page==="tka") renderUtbk();
+  renderPageVisibility();
+}
+
+/* ============================================================
+   EVENTS
+   ============================================================ */
+document.querySelector('.top-tabs button[data-page="beranda"]').onclick = ()=>{ state.page="beranda"; renderAll(); };
+document.querySelector('.top-tabs button[data-page="tka"]').onclick = ()=>{ state.page="tka"; renderAll(); };
+document.getElementById("btn-back").onclick = ()=>{ state.page="beranda"; renderAll(); };
+
+document.querySelectorAll(".curr-toggle button").forEach(btn=>{
+  btn.onclick = ()=>{
+    document.querySelectorAll(".curr-toggle button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    state.kurikulum = btn.dataset.k;
+    renderAll();
+  };
+});
+
+renderAll();
+</script>
+</body>
+</html>
